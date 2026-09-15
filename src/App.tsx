@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import SearchBox from "./components/Search-box";
 import RadioButtons from "./components/Radio-buttons";
 import CardList from "./components/Card-list";
+import Footer from "./components/Footer";
 
 import FilteredMonsters from "./utils/filter-monsters-utils";
 import type { Monster } from "./types/monster";
@@ -161,7 +162,7 @@ function App() {
         />
       </section>
 
-      <section id="spacer"></section>
+      <Footer />
     </>
   );
 }
