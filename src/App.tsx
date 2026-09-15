@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import BattleSelection from "./components/Battle-selection";
 import SearchBox from "./components/Search-box";
 import RadioButtons from "./components/Radio-buttons";
 import CardList from "./components/Card-list";
@@ -33,6 +34,18 @@ function App() {
   const [selectedMonsters, setSelectedMonsters] = useState<Monster[]>([]);
 
   const [winner, setWinner] = useState<Monster | null>(null);
+  const [isFighting, setIsFighting] = useState(false);
+
+  useEffect(() => {
+    if (!isFighting) return;
+
+    const timer = window.setTimeout(() => {
+      handleFight({ selectedMonsters, setWinner, setSelectedMonsters });
+      setIsFighting(false);
+    }, 1200);
+
+    return () => window.clearTimeout(timer);
+  }, [isFighting, selectedMonsters]);
 
   useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/users")
@@ -49,23 +62,25 @@ function App() {
       });
   }, []);
 
-  const filteredMonsters = FilteredMonsters(
-    monsters,
-    searchField,
-    rarityFilter,
-    sortOrder,
+  const filteredMonsters = useMemo(
+    () => FilteredMonsters(monsters, searchField, rarityFilter, sortOrder),
+    [monsters, searchField, rarityFilter, sortOrder],
   );
 
-  const handleSelectMonster = (monster: Monster) => {
-    selectedMonstersHandler(monster, selectedMonsters, setSelectedMonsters);
-  };
+  const handleSelectMonster = useCallback((monster: Monster) => {
+    if (isFighting) return;
+    selectedMonstersHandler(monster, setSelectedMonsters);
+  }, [isFighting]);
+
+  const clearSelectedMonsters = useCallback(() => {
+    if (isFighting) return;
+    setSelectedMonsters([]);
+  }, [isFighting]);
 
   const startFight = () => {
-    handleFight({
-      selectedMonsters,
-      setWinner,
-      setSelectedMonsters,
-    });
+    if (isFighting || selectedMonsters.length !== 2) return;
+    setWinner(null);
+    setIsFighting(true);
   };
 
   return (
@@ -109,20 +124,22 @@ function App() {
           setRarityFilter={setRarityFilter}
         />
 
-        <div className="mb-8 flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-gradient-to-br from-lime-400/10 via-violet-500/10 to-transparent p-6 text-center">
-          <h3 className="text-xl font-bold text-white">
-            Click on Monster Cards to Select and Fight!
-          </h3>
-          <p className="text-sm text-slate-400">
-            Selected: {selectedMonsters.length}/2
-          </p>
-        </div>
+        <BattleSelection
+          selectedMonsters={selectedMonsters}
+          onSelectMonster={handleSelectMonster}
+          onClear={clearSelectedMonsters}
+          isFighting={isFighting}
+        />
 
         {selectedMonsters.length === 2 && (
           <button
             onClick={startFight}
+            disabled={isFighting}
+            aria-label={isFighting ? "Battle in progress" : "Start battle"}
             className="
               mb-8
+              disabled:opacity-50
+              disabled:cursor-wait
               rounded-2xl
               border
               border-red-400/50

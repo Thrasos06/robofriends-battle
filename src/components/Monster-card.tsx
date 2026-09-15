@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Monster } from "../types/monster";
 import getRarity from "../utils/monster-utils";
 
@@ -66,9 +67,23 @@ const MonsterCard = ({ monster, isSelected, onSelect }: MonsterCardProps) => {
 
   return (
     <article
+      role="button"
+      tabIndex={0}
+      aria-pressed={isSelected}
+      aria-label={`${isSelected ? "Remove" : "Select"} ${name} ${isSelected ? "from" : "for"} battle`}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect(monster);
+        }
+      }}
       onClick={() => onSelect(monster)}
       className={`
         group
+        cursor-pointer
+        focus-visible:outline-2
+        focus-visible:outline-offset-4
+        focus-visible:outline-lime-300
         relative
         overflow-hidden
         rounded-3xl
@@ -348,4 +363,4 @@ const MonsterCard = ({ monster, isSelected, onSelect }: MonsterCardProps) => {
   );
 };
 
-export default MonsterCard;
+export default memo(MonsterCard);

@@ -2,26 +2,23 @@ import type { Monster } from "../types/monster";
 
 const selectedMonstersHandler = (
   monster: Monster,
-  selectedMonsters: Monster[],
   setSelectedMonsters: React.Dispatch<React.SetStateAction<Monster[]>>,
 ) => {
-  const alreadySelected = selectedMonsters.some(
-    (selected) => selected.id === monster.id,
-  );
-
-  if (alreadySelected) {
-    setSelectedMonsters(
-      selectedMonsters.filter((selected) => selected.id !== monster.id),
+  setSelectedMonsters((selectedMonsters) => {
+    const alreadySelected = selectedMonsters.some(
+      (selected) => selected.id === monster.id,
     );
 
-    return;
-  }
+    if (alreadySelected) {
+      return selectedMonsters.filter((selected) => selected.id !== monster.id);
+    }
 
-  if (selectedMonsters.length >= 2) {
-    return;
-  }
+    if (selectedMonsters.length >= 2) {
+      return selectedMonsters;
+    }
 
-  setSelectedMonsters([...selectedMonsters, monster]);
+    return [...selectedMonsters, monster];
+  });
 };
 
 export default selectedMonstersHandler;

@@ -1,0 +1,62 @@
+.battle-stage {
+  position: relative;
+  isolation: isolate;
+  --clash-x: calc(50% + 4px);
+  --clash-y: 0px;
+}
+
+.battle-fighter--0 { --direction: 1; }
+.battle-fighter--1 { --direction: -1; }
+
+.battle-stage--active .battle-fighter {
+  animation: battle-charge 1200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.battle-impact {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+  color: #ecfccb;
+  font-size: 1.5rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 12px #a3e635, 0 0 28px #a855f7;
+  animation: battle-impact 1200ms ease-out both;
+}
+
+@keyframes battle-charge {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  20% { transform: scale(0.94) rotate(calc(var(--direction) * -5deg)); }
+  43%, 52% {
+    transform: translate(calc(var(--direction) * var(--clash-x)), calc(var(--direction) * var(--clash-y))) scale(1.06) rotate(calc(var(--direction) * 7deg));
+  }
+  70% { transform: scale(0.96) rotate(calc(var(--direction) * -3deg)); }
+}
+
+@keyframes battle-impact {
+  0%, 35% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(-12deg); }
+  48%, 62% { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(-8deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+}
+
+@media (max-width: 639px) {
+  .battle-stage {
+    --clash-x: 0px;
+    --clash-y: calc(50% + 4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-stage--active .battle-fighter { animation: none; }
+  .battle-impact {
+    animation: none;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    background: #020617;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
